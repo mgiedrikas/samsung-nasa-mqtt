@@ -1,4 +1,5 @@
 import queue
+import struct
 import threading
 import time
 
@@ -8,6 +9,22 @@ from lib import get_logger
 
 # Configure Loguru Logging
 logger = get_logger(__name__)
+
+
+def parse_nasa_frame(data):
+    if len(data) < 5:
+        return None  # Frame too short
+
+    header = data[0]  # Usually fixed value (e.g., 0x32)
+    device_id = data[1]
+    function_code = data[2]
+    payload = data[3:-1]  # Data without checksum
+    checksum = data[-1]  # Last byte is checksum
+
+    print(f"Header: {hex(header)}, Device ID: {hex(device_id)}, Function: {hex(function_code)}")
+    print(f"Payload: {payload.hex()}, Checksum: {hex(checksum)}")
+
+    return header, device_id, function_code, payload, checksum
 
 
 class SerialHandler:
@@ -89,7 +106,8 @@ class SerialHandler:
 
                     if response and len(response) > 1:
                         # self.response_queue.put(response)
-                        print(tools.bin2hex(response))
+                        print(response)
+                        parse_nasa_frame(response)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
@@ -110,7 +128,5 @@ def main():
         time.sleep(1)
 
 
-
 if __name__ == '__main__':
     main()
-    
