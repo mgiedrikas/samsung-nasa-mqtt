@@ -161,17 +161,10 @@ class SerialHandler:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
                     response = self.conn.readline()
-
-                    # logger.info(f"connection_reader {type(response)}: '{response.hex()}'")
-                    if len(response) == 1 and response[0] == b'\n':
-                        continue
-
-                    if response and len(response) > 1:
-                        # self.response_queue.put(response)
-                        payload = parser.parse_nasa(response)
-                        print(response)
-                        res = parser.parse_nasa(response)
-                        print(res)
+                    # self.response_queue.put(response)
+                    print(response)
+                    res = parser.parse_nasa(response)
+                    print(res)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
