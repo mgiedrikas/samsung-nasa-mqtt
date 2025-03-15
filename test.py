@@ -160,7 +160,7 @@ class SerialHandler:
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.read(2048)
+                    response = self.conn.readline()
                     # self.response_queue.put(response)
                     if response:
                         print(response)
