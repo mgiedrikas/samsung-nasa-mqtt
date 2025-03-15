@@ -162,9 +162,9 @@ class SerialHandler:
                     # .decode("utf-8", errors="ignore").strip()
                     response = self.conn.readline()
                     # self.response_queue.put(response)
-                    if response:
-                        print(response)
-                        print(" ".join(f"{b:02X}" for b in response))
+                    print(response)
+                    print(" ".join(f"{b:02X}" for b in response))
+                    if len(response) > 0:
                         res = parser.parse_nasa(response)
                         print(res)
 
