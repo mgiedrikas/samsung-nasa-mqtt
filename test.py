@@ -106,6 +106,10 @@ def main():
     s = SerialHandler("/dev/ttyUSB0", 9600)
     s.start()
 
+    while True:
+        time.sleep(1)
+
+
 
 if __name__ == '__main__':
     main()
