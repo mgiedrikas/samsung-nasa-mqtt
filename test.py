@@ -170,7 +170,8 @@ class SerialHandler:
                         # self.response_queue.put(response)
                         payload = parser.parse_nasa(response)
                         print(response)
-                        parser.parse_nasa(response)
+                        res = parser.parse_nasa(response)
+                        print(res)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
