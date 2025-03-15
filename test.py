@@ -112,7 +112,7 @@ class SerialHandler:
                 if self.conn and self.conn.is_open:
                     return  # Connection already open
 
-                self.conn = serial.Serial(self.port, self.baud, timeout=0.1)
+                self.conn = serial.Serial(self.port, self.baud)
                 logger.info(f"Connected to Serial {self.port} at {self.baud} baud")
                 return
             except serial.SerialException as e:
