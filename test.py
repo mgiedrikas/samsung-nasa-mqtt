@@ -164,10 +164,10 @@ class SerialHandler:
                     # self.response_queue.put(response)
 
                     if len(response) > 0:
-                        print(response)
-                        print(" ".join(f"{b:02X}" for b in response))
+                        print("".join(f"{b:02X}" for b in response))
+                        print(len(response), "--" , "".join(f"{b:02X}" for b in response))
                         print()
-                        # res = parser.parse_nasa(response)
+                        res = parser.parse_nasa(response)
                         # print(res)
 
                 else:
@@ -190,4 +190,5 @@ def main():
 
 
 if __name__ == '__main__':
-    main()
+    # main()
+    payload = b'\xff\xaf\xad\xd7\xff\xbdU\xfd\xaf\xed\xff\xfd\xd5'
