@@ -164,6 +164,7 @@ class SerialHandler:
                     # self.response_queue.put(response)
                     if response:
                         print(response)
+                        print(response.hex().upper())
                         res = parser.parse_nasa(response)
                         print(res)
 
