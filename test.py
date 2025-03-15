@@ -112,7 +112,7 @@ class SerialHandler:
                 if self.conn and self.conn.is_open:
                     return  # Connection already open
 
-                self.conn = serial.Serial(self.port, self.baud)
+                self.conn = serial.Serial(self.port, self.baud, timeout=1)
                 logger.info(f"Connected to Serial {self.port} at {self.baud} baud")
                 return
             except serial.SerialException as e:
@@ -160,13 +160,14 @@ class SerialHandler:
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.read(1)
+                    response = self.conn.readline()
                     # self.response_queue.put(response)
-                    print(response)
-                    print(" ".join(f"{b:02X}" for b in response))
-                    # if len(response) > 0:
-                    #     res = parser.parse_nasa(response)
-                    #     print(res)
+
+                    if len(response) > 0:
+                        print(response)
+                        print(" ".join(f"{b:02X}" for b in response))
+                        # res = parser.parse_nasa(response)
+                        # print(res)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
