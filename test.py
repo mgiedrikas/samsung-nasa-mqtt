@@ -164,7 +164,7 @@ class SerialHandler:
                     # self.response_queue.put(response)
                     if response:
                         print(response)
-                        print(response.hex().upper())
+                        print(" ".join(f"{b:02X}" for b in response))
                         res = parser.parse_nasa(response)
                         print(res)
 
