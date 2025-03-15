@@ -160,11 +160,12 @@ class SerialHandler:
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.readline()
+                    response = self.conn.read(2048)
                     # self.response_queue.put(response)
-                    print(response)
-                    res = parser.parse_nasa(response)
-                    print(res)
+                    if response:
+                        print(response)
+                        res = parser.parse_nasa(response)
+                        print(res)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
