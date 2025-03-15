@@ -166,6 +166,7 @@ class SerialHandler:
                     if len(response) > 0:
                         print(response)
                         print(" ".join(f"{b:02X}" for b in response))
+                        print()
                         # res = parser.parse_nasa(response)
                         # print(res)
 
