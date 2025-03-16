@@ -93,7 +93,7 @@ class SerialHandler:
                         #     payload = bytearray()
 
                         # res = parser.parse_nasa(response)
-                        print(response.hex(' '))
+                        print(response.hex(' '), '\n')
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
