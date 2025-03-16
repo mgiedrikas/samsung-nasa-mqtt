@@ -129,7 +129,7 @@ class SerialHandler:
 
                 if msg_start_found:
                     payload.extend(b)
-                else:
+                elif b != b'\x34':
                     discarded.extend(b)
 
             except queue.Empty:
