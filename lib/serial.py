@@ -93,7 +93,7 @@ class SerialHandler:
                             print()
                             payload = []
                         else:
-                            payload.append(response)
+                            payload.extend(response)
                         # res = parser.parse_nasa(response)
                         # print(res)
 
