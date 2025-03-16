@@ -87,7 +87,7 @@ class SerialHandler:
                     # self.response_queue.put(response)
 
                     if len(response) > 0:
-                        if response == b'x32':
+                        if response == b'\x32':
                             print("".join(f"{b:02X}" for b in payload))
                             print(len(payload), "--", " ".join(f"{b:02X}" for b in payload))
                             print()
