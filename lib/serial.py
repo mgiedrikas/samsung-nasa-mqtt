@@ -92,6 +92,7 @@ class SerialHandler:
                             print(len(payload), "--", " ".join(f"{b:02X}" for b in payload))
                             print()
                             payload = []
+                            payload.extend(response)
                         else:
                             payload.extend(response)
                         # res = parser.parse_nasa(response)
