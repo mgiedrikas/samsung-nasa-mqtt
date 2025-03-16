@@ -84,7 +84,6 @@ class SerialHandler:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
                     response = self.conn.read(1)
-                    print(type(response), len(response))
                     if len(response) > 0:
                         if response not in (b'\r', b'\n'):
                             self.response_queue.put_nowait(response)
