@@ -89,8 +89,7 @@ class SerialHandler:
                     if len(response) > 0:
                         payload.extend(response)
                         if response == b'\x34':
-                            print(len(payload), ':', payload.hex(' '))
-                            print()
+                            print(payload.hex(' '))
                             payload = bytearray()
 
                         # res = parser.parse_nasa(response)
