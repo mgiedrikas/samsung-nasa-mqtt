@@ -42,6 +42,7 @@ class NasaPacketParser:
 
         size = (data[1] << 8) | data[2]
         if size + 2 != len(data):
+            print(f'size {size} != {len(data)}')
             return DecodeResult.SizeDidNotMatch
 
         crc_actual = crc16(data, 3, size - 4)
