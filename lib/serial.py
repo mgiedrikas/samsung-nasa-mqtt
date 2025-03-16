@@ -84,6 +84,7 @@ class SerialHandler:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
                     response = self.conn.read(1)
+                    print('connection_reader', response.hex())
                     if len(response) > 0:
                         if response[0] not in (b'\r', b'\n'):
                             self.response_queue.put_nowait(response[0])
@@ -103,7 +104,7 @@ class SerialHandler:
         payload = bytearray()
         msg_start_found = False
         msg_end_found = False
-
+        logger.info(f'process_queue starting...')
         while not self.shutdown_event.is_set():
             try:
                 b = self.response_queue.get_nowait()
