@@ -90,7 +90,7 @@ class SerialHandler:
                             msg_start_found = True
                         if msg_start_found:
                             payload.extend(response)
-                        if response == b'\x34':
+                        if response == b'\x34' and len(payload) > 0:
                             print(payload)
                             print(payload.hex(' '))
                             print()
