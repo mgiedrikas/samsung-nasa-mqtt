@@ -101,26 +101,35 @@ class SerialHandler:
     def process_queue(self):
         parser = NasaPacketParser()
         payload = bytearray()
+        discarded = bytearray()
         msg_start_found = False
         msg_end_found = False
         logger.info(f'process_queue starting...')
         while not self.shutdown_event.is_set():
             try:
                 b = self.response_queue.get_nowait()
-
-                # b = item[0]
                 if b == b'\x34':
                     msg_end_found = True
-
-                if b == b'\x32' and msg_end_found:
+                    msg_start_found = False
                     if len(payload) > 0:
-                        msg_end_found = False
                         print(f'{len(payload)}:', payload.hex(' '))
                         parser.parse_nasa(payload)
                         print()
+                        print('-'*100)
+                        print('discarded')
+                        print(f'{len(discarded)}:', discarded.hex(' '))
+                        print('-'*100)
                         payload = bytearray()
+                        discarded = bytearray()
 
-                payload.extend(b)
+                if b == b'\x32' and msg_end_found:
+                    msg_start_found = True
+                    msg_end_found = False
+
+                if msg_start_found:
+                    payload.extend(b)
+                else:
+                    discarded.extend(b)
 
             except queue.Empty:
                 time.sleep(0.002)
