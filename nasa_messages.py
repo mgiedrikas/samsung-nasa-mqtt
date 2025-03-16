@@ -93,7 +93,7 @@ nasa_message_numbers = [
     [0x0443, "NASA_PEAK_SYNC_TIME"],
     [0x0444, "NASA_PEAK_CURRENT_DEMAND"],
     [0x0445, "NASA_PEAK_REAL_VALUE"],
-    [0x0448, "LVAR_AD_MCU_PORT_SETUP "],
+    [0x0448, "LVAR_AD_MCU_PORT_SETUP"],
     [0x0600, "STR_AD_OPTION_BASIC"],
     [0x0601, "STR_AD_OPTION_INSTALL"],
     [0x0602, "STR_AD_OPTION_INSTALL_2"],
@@ -182,7 +182,7 @@ nasa_message_numbers = [
     [0x404F, "ENUM_IN___"],
     [0x4050, "NASA_CONTROL_SILENCT"],
     [0x4051, "ENUM_IN___"],
-    [0x4059, "ENUM_IN___ "],
+    [0x4059, "ENUM_IN___"],
     [0x405B, "NASA_USE_OUTER_COOL"],
     [0x405C, "NASA_CONTROL_OUTER_COOL"],
     [0x405D, "NASA_USE_DESIRED_HUMIDITY"],
@@ -200,12 +200,12 @@ nasa_message_numbers = [
     [0x406B, "NASA_SMART_GRID"],
     [0x406C, "ENUM_IN_BACKUP_HEATER"],
     [0x406D, "ENUM_IN_OUTING_MODE"],
-    [0x406E, "ENUM_IN_QUIET_MODE "],
+    [0x406E, "ENUM_IN_QUIET_MODE"],
     [0x406F, "ENUM_IN_REFERENCE_EHS_TEMP"],
     [0x4070, "ENUM_IN_DISCHAGE_TEMP_CONTROL"],
     [0x4073, "ENUM_IN___"],
     [0x4074, "ENUM_IN___"],
-    [0x4076, "ENUM_IN_ROOM_TEMP_SENSOR "],
+    [0x4076, "ENUM_IN_ROOM_TEMP_SENSOR"],
     [0x4077, "ENUM_IN___"],
     [0x407B, "ENUM_IN___"],
     [0x407D, "ENUM_IN___"],
@@ -239,7 +239,7 @@ nasa_message_numbers = [
     [0x40B1, "NASA_DHW_OPMODE_SUPPORT"],
     [0x40B4, "ENUM_IN_FSV_5061"],
     [0x40B5, "ENUM_IN___"],
-    [0x40BB, "ENUM_IN_STATE_AUTO_STATIC_PRESSURE_RUNNING "],
+    [0x40BB, "ENUM_IN_STATE_AUTO_STATIC_PRESSURE_RUNNING"],
     [0x40BC, "NASA_VACANCY_STATUS"],
     [0x40BD, "ENUM_IN_EMPTY_ROOM_CONTROL_USED"],
     [0x40C0, "ENUM_IN_FSV_4041"],
@@ -1207,3 +1207,16 @@ def nasa_poke(source=None):
                          + "01"
                          # PNP poke to detect other nodes
                          + "4242FFFF")
+
+
+if __name__ == '__main__':
+    duplicates = {}
+    for ns in nasa_message_numbers:
+        if ns[1] in duplicates:
+            duplicates[ns[1]] += 1
+        else:
+            duplicates[ns[1]] = 0
+        if duplicates[ns[1]] > 0:
+            print(f'{ns[1]}{duplicates[ns[1]]} = 0x{ns[0]:04X}')
+        else:
+            print(f'{ns[1]} = 0x{ns[0]:04X}')
