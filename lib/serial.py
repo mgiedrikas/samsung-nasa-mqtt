@@ -83,17 +83,17 @@ class SerialHandler:
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.read()
+                    response = self.conn.readline()
                     # self.response_queue.put(response)
 
                     if len(response) > 0:
-                        payload.extend(response)
-                        if response == b'\x34':
-                            print(payload.hex(' '))
-                            payload = bytearray()
+                        # payload.extend(response)
+                        # if response == b'\x34':
+                        #     print(payload.hex(' '))
+                        #     payload = bytearray()
 
                         # res = parser.parse_nasa(response)
-                        # print(res)
+                        print(response.hex(' '))
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
