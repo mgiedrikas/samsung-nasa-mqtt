@@ -77,18 +77,23 @@ class SerialHandler:
         """Reads data continuously on a separate thread and stores it in the queue."""
         logger.info("Starting new reader thread")
         # parser = NasaPacketParser()
+        payload = bytearray()
         while not self.shutdown_event.is_set():
             # logger.info(f"reader thread loop, serial: {isinstance(self.conn, serial.Serial)}, telnet: {isinstance(self.conn, socket.socket)}")
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.readline()
+                    response = self.conn.read()
                     # self.response_queue.put(response)
 
                     if len(response) > 0:
-                        print("".join(f"{b:02X}" for b in response))
-                        print(len(response), "--", " ".join(f"{b:02X}" for b in response))
-                        print()
+                        if response == b'x32':
+                            print("".join(f"{b:02X}" for b in payload))
+                            print(len(payload), "--", " ".join(f"{b:02X}" for b in payload))
+                            print()
+                            paload = bytearray()
+                        else:
+                            payload.append(response)
                         # res = parser.parse_nasa(response)
                         # print(res)
 
