@@ -4,11 +4,29 @@ from typing import List
 
 
 class PacketType(Enum):
-    StandBy = 0  # Placeholder for actual values
+    StandBy = 0
+    Normal = 1
+    Gathering = 2
+    Install = 3
+    Download = 4
 
 
 class DataType(Enum):
-    Undefined = 0  # Placeholder for actual values
+    Undefined = 0
+    Read = 1
+    Write = 2
+    Request = 3
+    Notification = 4
+    Response = 5
+    Ack = 6
+    Nack = 7
+
+
+class MessageSetType(Enum):
+    Enum = 0
+    Variable = 1
+    LongVariable = 2
+    Structure = 3
 
 
 class Address:
