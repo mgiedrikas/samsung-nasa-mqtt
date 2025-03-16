@@ -86,7 +86,7 @@ class SerialHandler:
                     response = self.conn.read(1)
                     if len(response) > 0:
                         if response not in (b'\r', b'\n'):
-                            self.response_queue.put_nowait(response)
+                            self.response_queue.put(response)
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
@@ -107,7 +107,7 @@ class SerialHandler:
         logger.info(f'process_queue starting...')
         while not self.shutdown_event.is_set():
             try:
-                b = self.response_queue.get_nowait()
+                b = self.response_queue.get()
                 if b == b'\x34':
                     msg_end_found = True
                     msg_start_found = False
@@ -129,6 +129,7 @@ class SerialHandler:
                     msg_end_found = False
 
                 if msg_start_found:
+
                     payload.extend(b)
                 else:
                     discarded.extend(b)
