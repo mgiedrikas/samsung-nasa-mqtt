@@ -112,13 +112,14 @@ class SerialHandler:
                     msg_end_found = True
                     msg_start_found = False
                     if len(payload) > 0:
+                        payload.extend(b)
+                        print('-'*100)
                         print(f'{len(payload)}:', payload.hex(' '))
                         parser.parse_nasa(payload)
-                        print()
-                        print('-'*100)
-                        print('discarded')
+                        print('\ndiscarded')
                         print(f'{len(discarded)}:', discarded.hex(' '))
                         print('-'*100)
+                        print()
                         payload = bytearray()
                         discarded = bytearray()
 
