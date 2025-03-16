@@ -78,22 +78,23 @@ class SerialHandler:
         logger.info("Starting new reader thread")
         # parser = NasaPacketParser()
         payload = bytearray()
+        msg_start_found = False
         while not self.shutdown_event.is_set():
             # logger.info(f"reader thread loop, serial: {isinstance(self.conn, serial.Serial)}, telnet: {isinstance(self.conn, socket.socket)}")
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.readline()
-                    # self.response_queue.put(response)
-
+                    response = self.conn.read()
                     if len(response) > 0:
-                        # payload.extend(response)
-                        # if response == b'\x34':
-                        #     print(payload.hex(' '))
-                        #     payload = bytearray()
+                        if response == b'\x32':
+                            msg_start_found = True
+                        if msg_start_found:
+                            payload.extend(response)
+                        if response == b'\x34':
+                            print(payload.hex(' '))
+                            payload = bytearray()
+                            msg_start_found = False
 
-                        # res = parser.parse_nasa(response)
-                        print(response.hex(' '), '\n')
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
