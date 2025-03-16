@@ -48,7 +48,7 @@ class NasaPacketParser:
         crc_actual = crc16(data, 3, size - 4)
         crc_expected = (data[-3] << 8) | data[-2]
 
-        print(f' - sizeok: {size - 2 == len(data)}')
+        print(f' - sizeok: {size + 2 == len(data)}')
         print(f' - crc ok: {crc_actual == crc_expected}')
 
         if crc_expected != crc_actual:
