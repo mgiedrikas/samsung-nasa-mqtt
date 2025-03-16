@@ -110,15 +110,14 @@ class SerialHandler:
 
                 # b = item[0]
                 if b == b'\x34':
-                    print('msg_end_found', b.hex())
                     msg_end_found = True
 
                 if b == b'\x32' and msg_end_found:
                     if len(payload) > 0:
                         msg_end_found = False
                         print(f'{len(payload)}:', payload.hex(' '))
-                        # parser.parse_nasa(payload)
-                        # print()
+                        parser.parse_nasa(payload)
+                        print()
                         payload = bytearray()
 
                 payload.extend(b)
