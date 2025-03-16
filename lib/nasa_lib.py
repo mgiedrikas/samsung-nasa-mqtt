@@ -827,6 +827,13 @@ class MessageSet:
 
         return set_instance
 
+    def __repr__(self):
+        value_repr = self.value
+        if isinstance(self.value, Buffer):
+            value_repr = f"Buffer(size={len(self.value.data)}, data={self.value.data.hex().upper()})"
+        return (f"MessageSet(message_number={self.message_number.name} (0x{self.message_number.value:04X}), "
+                f"type={self.type.name}, value={value_repr}, size={self.size})")
+
 
 class PacketType(Enum):
     StandBy = 0

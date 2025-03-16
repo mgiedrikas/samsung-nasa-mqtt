@@ -29,56 +29,57 @@ class NasaPacketParser:
         return binascii.hexlify(data).decode()
 
     def parse_nasa(self, data: bytes):
-        if data[0] != 0x32:
-            return DecodeResult.InvalidStartByte
-        if data[-1] != 0x34:
-            return DecodeResult.InvalidEndByte
-        if len(data) < 16 or len(data) > 1500:
-            return DecodeResult.UnexpectedSize
+        try:
+            if data[0] != 0x32:
+                return DecodeResult.InvalidStartByte
+            if data[-1] != 0x34:
+                return DecodeResult.InvalidEndByte
+            if len(data) < 16 or len(data) > 1500:
+                return DecodeResult.UnexpectedSize
 
-        size = (data[1] << 8) | data[2]
-        if size + 2 != len(data):
-            print(f' - size expected {size + 2} != paylod {len(data)}')
-            return DecodeResult.SizeDidNotMatch
+            size = (data[1] << 8) | data[2]
+            if size + 2 != len(data):
+                print(f' - size expected {size + 2} != paylod {len(data)}')
+                return DecodeResult.SizeDidNotMatch
 
-        crc_actual = crc16(data, 3, size - 4)
-        crc_expected = (data[-3] << 8) | data[-2]
+            crc_actual = crc16(data, 3, size - 4)
+            crc_expected = (data[-3] << 8) | data[-2]
 
-        print(f' - sizeok: {size + 2 == len(data)}')
-        print(f' - crc ok: {crc_actual == crc_expected}')
+            print(f' - sizeok: {size + 2 == len(data)}')
+            print(f' - crc ok: {crc_actual == crc_expected}')
 
-        if crc_expected != crc_actual:
-            print(f"NASA: invalid crc - got {crc_actual} but should be {crc_expected}")
-            print(data.hex(' '))
-            return DecodeResult.CrcError
+            if crc_expected != crc_actual:
+                print(f"NASA: invalid crc - got {crc_actual} but should be {crc_expected}")
+                print(data.hex(' '))
+                return DecodeResult.CrcError
 
-        cursor = 3
-        sa = Address()
-        sa.decode(data, cursor)
-        cursor += sa.size
+            cursor = 3
+            sa = Address()
+            sa.decode(data, cursor)
+            cursor += sa.size
 
-        da = Address()
-        da.decode(data, cursor)
-        cursor += da.size
+            da = Address()
+            da.decode(data, cursor)
+            cursor += da.size
 
-        command = Command()
-        command.decode(data, cursor)
-        cursor += command.size
+            command = Command()
+            command.decode(data, cursor)
+            cursor += command.size
 
-        capacity = data[cursor]
-        cursor += 1
-        print(f' - Src.{sa}')
-        print(f' - Dst.{da}')
-        print(command)
-        print(f'capacity {capacity} bytes, cursor: {cursor}')
-        print()
+            capacity = data[cursor]
+            cursor += 1
+            print(f' - Src.{sa}')
+            print(f' - Dst.{da}')
+            print(command)
+            print(f'capacity {capacity} bytes, cursor: {cursor}')
+            print()
 
-        messages = []
-        for _ in range(1, capacity + 1):
-            message_set = MessageSet.decode(data, cursor, capacity)
-            messages.append(message_set)
-            cursor += message_set.size
-            print(message_set)
+            messages = []
+            for _ in range(1, capacity + 1):
+                message_set = MessageSet.decode(data, cursor, capacity)
+                messages.append(message_set)
+                cursor += message_set.size
+                print(message_set)
 
         # dsCnt = data[9]
         # print(f'dsCnt {dsCnt} bytes')
@@ -129,9 +130,9 @@ class NasaPacketParser:
         #
         #     print("\n".join(output))
         #
-        # except Exception as e:
-        #     print(e)
-        #     return DecodeResult.Failure
+        except Exception as e:
+            print(e)
+            return DecodeResult.Failure
 
         return DecodeResult.Success  # Assuming a success case exists
 
