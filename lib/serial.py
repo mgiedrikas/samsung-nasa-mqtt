@@ -72,32 +72,21 @@ class SerialHandler:
             self.reader_thread.start()
             # self.restart_thread = threading.Thread(target=self.restart, daemon=True)
             # self.restart_thread.start()
+            self.process_queue()
 
     def connection_reader(self):
         """Reads data continuously on a separate thread and stores it in the queue."""
         logger.info("Starting new reader thread")
-        parser = NasaPacketParser()
-        payload = bytearray()
-        msg_start_found = False
+
         while not self.shutdown_event.is_set():
             # logger.info(f"reader thread loop, serial: {isinstance(self.conn, serial.Serial)}, telnet: {isinstance(self.conn, socket.socket)}")
             try:
                 if self.conn:
                     # .decode("utf-8", errors="ignore").strip()
-                    response = self.conn.read()
+                    response = self.conn.read(1)
                     if len(response) > 0:
-                        if response == b'\x32':
-                            msg_start_found = True
-                        if msg_start_found:
-                            payload.extend(response)
-                        if response == b'\x34' and len(payload) > 0:
-                            print(f'{len(payload)}:', payload.hex(' '))
-                            parser.parse_nasa(payload)
-                            print()
-                            payload = bytearray()
-                            msg_start_found = False
-
-
+                        if response[0] not in (b'\r', b'\n'):
+                            self.response_queue.put_nowait(response[0])
 
                 else:
                     logger.warning("Connection lost, restarting reader...")
@@ -108,3 +97,33 @@ class SerialHandler:
                 logger.error(f"Reader Error: {e}")
                 self.restart_event.set()
                 break
+
+    def process_queue(self):
+        parser = NasaPacketParser()
+        payload = bytearray()
+        msg_start_found = False
+        msg_end_found = False
+
+        while not self.shutdown_event.is_set():
+            try:
+                b = self.response_queue.get_nowait()
+                if b == b'\x34':
+                    msg_end_found = True
+
+                if b == b'\x32' and msg_end_found:
+                    if len(payload) > 0:
+                        msg_end_found = False
+                        print(f'{len(payload)}:', payload.hex(' '))
+                        parser.parse_nasa(payload)
+                        print()
+                        payload = bytearray()
+
+                payload.append(b)
+
+            except queue.Empty:
+                time.sleep(0.002)
+                continue
+            except Exception as e:
+                logger.error(f"Queue Error: {e}")
+
+
