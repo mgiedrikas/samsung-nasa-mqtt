@@ -108,7 +108,7 @@ class SerialHandler:
         while not self.shutdown_event.is_set():
             try:
                 item: bytes = self.response_queue.get_nowait()
-
+                print(item)
                 b = item[0]
                 if b == b'\x34':
                     print('msg_end_found', item.hex())
