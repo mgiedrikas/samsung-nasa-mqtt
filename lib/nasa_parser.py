@@ -82,10 +82,9 @@ class Command:
         return (f"PacketInformation: {int(self.packet_information)}\n"
                 f"ProtocolVersion: {self.protocol_version}\n"
                 f"RetryCount: {self.retry_count}\n"
-                f"PacketType: {int(self.packet_type)}\n"
-                f"DataType: {int(self.data_type)}\n"
+                f"PacketType: {self.packet_type}\n"
+                f"DataType: {self.data_type}\n"
                 f"PacketNumber: {self.packet_number}")
-
 
 
 
