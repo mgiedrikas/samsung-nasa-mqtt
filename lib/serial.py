@@ -107,11 +107,11 @@ class SerialHandler:
         logger.info(f'process_queue starting...')
         while not self.shutdown_event.is_set():
             try:
-                item: bytes = self.response_queue.get_nowait()
-                print(item)
-                b = item[0]
+                b: bytes = self.response_queue.get_nowait()
+
+                # b = item[0]
                 if b == b'\x34':
-                    print('msg_end_found', item.hex())
+                    print('msg_end_found', b.hex())
                     msg_end_found = True
 
                 if b == b'\x32' and msg_end_found:
