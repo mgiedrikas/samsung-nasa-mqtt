@@ -122,6 +122,7 @@ class SerialHandler:
                         print()
                         payload = bytearray()
                         discarded = bytearray()
+                        continue
 
                 if b == b'\x32' and msg_end_found:
                     msg_start_found = True
@@ -129,8 +130,9 @@ class SerialHandler:
 
                 if msg_start_found:
                     payload.extend(b)
-                elif b != b'\x34':
+                else:
                     discarded.extend(b)
+
 
             except queue.Empty:
                 time.sleep(0.002)
