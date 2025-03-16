@@ -86,7 +86,7 @@ class SerialHandler:
                     response = self.conn.read(1)
                     print(type(response), len(response))
                     if len(response) > 0:
-                        if response[0] not in (b'\r', b'\n'):
+                        if response not in (b'\r', b'\n'):
                             self.response_queue.put_nowait(response)
 
                 else:
@@ -108,7 +108,6 @@ class SerialHandler:
         while not self.shutdown_event.is_set():
             try:
                 b = self.response_queue.get_nowait()
-                print('process_queue', type(b), len(b))
 
                 # b = item[0]
                 if b == b'\x34':
@@ -119,8 +118,8 @@ class SerialHandler:
                     if len(payload) > 0:
                         msg_end_found = False
                         print(f'{len(payload)}:', payload.hex(' '))
-                        parser.parse_nasa(payload)
-                        print()
+                        # parser.parse_nasa(payload)
+                        # print()
                         payload = bytearray()
 
                 payload.extend(b)
