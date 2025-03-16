@@ -5,7 +5,7 @@ import time
 import serial
 
 from lib import get_logger
-
+from lib.nasa_parser import NasaPacketParser
 
 logger = get_logger(__name__)
 
@@ -76,7 +76,7 @@ class SerialHandler:
     def connection_reader(self):
         """Reads data continuously on a separate thread and stores it in the queue."""
         logger.info("Starting new reader thread")
-        # parser = NasaPacketParser()
+        parser = NasaPacketParser()
         payload = bytearray()
         msg_start_found = False
         while not self.shutdown_event.is_set():
@@ -91,9 +91,11 @@ class SerialHandler:
                         if msg_start_found:
                             payload.extend(response)
                         if response == b'\x34' and len(payload) > 0:
+                            parser.parse_nasa(payload)
                             print(payload.hex(' '))
                             payload = bytearray()
                             msg_start_found = False
+
 
 
                 else:
