@@ -91,8 +91,9 @@ class SerialHandler:
                         if msg_start_found:
                             payload.extend(response)
                         if response == b'\x34' and len(payload) > 0:
-                            print(f'{len(payload)}:', payload.hex(' '), '\n')
+                            print(f'{len(payload)}:', payload.hex(' '))
                             parser.parse_nasa(payload)
+                            print()
                             payload = bytearray()
                             msg_start_found = False
 
