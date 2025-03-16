@@ -42,11 +42,13 @@ class NasaPacketParser:
 
         size = (data[1] << 8) | data[2]
         if size + 2 != len(data):
-            print(f'size {size} != {len(data)}')
+            print(f'size expected {size} != paylod {len(data)}')
             return DecodeResult.SizeDidNotMatch
 
         crc_actual = crc16(data, 3, size - 4)
         crc_expected = (data[-3] << 8) | data[-2]
+
+        print(f'crc_actual: {crc_actual}, crc_expected: {crc_expected}')
 
         if crc_expected != crc_actual:
             print(f"NASA: invalid crc - got {crc_actual} but should be {crc_expected}")
