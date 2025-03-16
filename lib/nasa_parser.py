@@ -42,9 +42,9 @@ class Address:
         self.address = 0
 
     def decode(self, data: bytes, index: int):
-        self.klass = data[index]  # Assuming klass is a single byte
-        self.channel = data[index + 1]
-        self.address = data[index + 2]
+        self.klass = f"{data[index]:02X}"
+        self.channel = f"{data[index + 1]:02X}"
+        self.address = f"{data[index + 2]:02X}"
 
     def encode(self, data: List[int]):
         data.extend([self.klass, self.channel, self.address])
@@ -79,10 +79,14 @@ class Command:
         data.extend([byte1, byte2, self.packet_number])
 
     def __str__(self):
-        return (f"Command(packet_information={self.packet_information}, "
-                f"protocol_version={self.protocol_version}, retry_count={self.retry_count}, "
-                f"packet_type={self.packet_type}, data_type={self.data_type}, "
-                f"packet_number={self.packet_number})")
+        return (f"PacketInformation: {int(self.packet_information)}\n"
+                f"ProtocolVersion: {self.protocol_version}\n"
+                f"RetryCount: {self.retry_count}\n"
+                f"PacketType: {int(self.packet_type)}\n"
+                f"DataType: {int(self.data_type)}\n"
+                f"PacketNumber: {self.packet_number}")
+
+
 
 
 class DecodeResult(Enum):
@@ -160,70 +164,58 @@ class NasaPacketParser:
         print(f'capacity {capacity} bytes, cursor: {cursor}')
         print()
 
-        src = data[0:3]
-        dst = data[3:6]
-        isInfo = (data[6] & 0x80) >> 7
-        protVersion = (data[6] & 0x60) >> 5
-        retryCnt = (data[6] & 0x18) >> 3
-        packetType = data[7] >> 4
-        payloadType = data[7] & 0xF
-        packetNumber = data[8]
         dsCnt = data[9]
-
-        # Convert packet type and payload type to human-readable format
-        packetTypStr = NasaPacketTypes[packetType] if packetType < len(NasaPacketTypes) else "unknown"
-        payloadTypeStr = NasaPayloadTypes[payloadType] if payloadType < len(NasaPayloadTypes) else "unknown"
+        print(f'dsCnt {dsCnt} bytes')
 
         output = []
-        output.append(f"Source: {self.bin2hex(src).upper()}")
-        output.append(f"Destination: {self.bin2hex(dst).upper()}")
-        output.append(f"Packet Type: {packetTypStr}")
-        output.append(f"Payload Type: {payloadTypeStr}")
-        output.append(f"Packet Number: {hex(packetNumber)}")
-
         ds = []
         off = 10
         seenMsgCnt = 0
 
-        for i in range(dsCnt):
-            seenMsgCnt += 1
-            kind = (data[off] & 0x6) >> 1
-            size_map = {0: 1, 1: 2, 2: 4}
-            s = size_map.get(kind, None)
+        try:
 
-            if s is None:
-                return f"Error: Invalid data size at offset {off}"
+            for i in range(dsCnt):
+                seenMsgCnt += 1
+                kind = (data[off] & 0x6) >> 1
+                size_map = {0: 1, 1: 2, 2: 4}
+                s = size_map.get(kind, None)
 
-            messageNumber = struct.unpack(">H", data[off: off + 2])[0]
-            value = data[off + 2:off + 2 + s]
-            valuehex = self.bin2hex(value)
+                if s is None:
+                    return f"Error: Invalid data size at offset {off}"
 
-            valuedec = []
-            if s == 1:
-                intval = struct.unpack(">b", value)[0]
-                valuedec.append(intval)
-                valuedec.append("ON" if value[0] != 0 else "OFF")
-            elif s == 2:
-                intval = struct.unpack(">h", value)[0]
-                valuedec.append(intval)
-                valuedec.append(intval / 10.0)
-            elif s == 4:
-                intval = struct.unpack(">i", value)[0]
-                valuedec.append(intval)
-                valuedec.append(intval / 10.0)
+                messageNumber = struct.unpack(">H", data[off: off + 2])[0]
+                value = data[off + 2:off + 2 + s]
+                valuehex = self.bin2hex(value)
 
-            desc = nasa_message_name(messageNumber) if "nasa_message_name" in globals() else "UNSPECIFIED"
+                valuedec = []
+                if s == 1:
+                    intval = struct.unpack(">b", value)[0]
+                    valuedec.append(intval)
+                    valuedec.append("ON" if value[0] != 0 else "OFF")
+                elif s == 2:
+                    intval = struct.unpack(">h", value)[0]
+                    valuedec.append(intval)
+                    valuedec.append(intval / 10.0)
+                elif s == 4:
+                    intval = struct.unpack(">i", value)[0]
+                    valuedec.append(intval)
+                    valuedec.append(intval / 10.0)
 
-            output.append(f"  {hex(messageNumber)} ({desc}): {valuehex} | {valuedec}")
-            ds.append([messageNumber, desc, valuehex, value, valuedec])
-            off += 2 + s
+                desc = nasa_message_name(messageNumber) if "nasa_message_name" in globals() else "UNSPECIFIED"
 
-        if seenMsgCnt != dsCnt:
-            print("Error: Not every message processed")
+                output.append(f"  {hex(messageNumber)} ({desc}): {valuehex} | {valuedec}")
+                ds.append([messageNumber, desc, valuehex, value, valuedec])
+                off += 2 + s
+
+            if seenMsgCnt != dsCnt:
+                print("Error: Not every message processed")
+                return DecodeResult.Failure
+
+            print("\n".join(output))
+
+        except Exception as e:
+            print(e)
             return DecodeResult.Failure
-
-        print("\n".join(output))
-
 
         return DecodeResult.Success  # Assuming a success case exists
 
