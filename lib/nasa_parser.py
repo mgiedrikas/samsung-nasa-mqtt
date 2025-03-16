@@ -1,6 +1,10 @@
 import binascii
+import struct
 from enum import Enum
 from typing import List
+
+from nasa_messages import nasa_message_name
+from packetgateway import NasaPacketTypes, NasaPayloadTypes
 
 
 class PacketType(Enum):
@@ -80,6 +84,7 @@ class Command:
                 f"packet_type={self.packet_type}, data_type={self.data_type}, "
                 f"packet_number={self.packet_number})")
 
+
 class DecodeResult(Enum):
     InvalidStartByte = 1
     UnexpectedSize = 2
@@ -87,6 +92,7 @@ class DecodeResult(Enum):
     InvalidEndByte = 4
     CrcError = 5
     Success = 6
+    Failure = 7
 
 
 def crc16(data: bytes, start_index: int, length: int) -> int:
@@ -152,6 +158,72 @@ class NasaPacketParser:
         capacity = data[cursor]
         cursor += 1
         print(f'capacity {capacity} bytes, cursor: {cursor}')
+        print()
+
+        src = data[0:3]
+        dst = data[3:6]
+        isInfo = (data[6] & 0x80) >> 7
+        protVersion = (data[6] & 0x60) >> 5
+        retryCnt = (data[6] & 0x18) >> 3
+        packetType = data[7] >> 4
+        payloadType = data[7] & 0xF
+        packetNumber = data[8]
+        dsCnt = data[9]
+
+        # Convert packet type and payload type to human-readable format
+        packetTypStr = NasaPacketTypes[packetType] if packetType < len(NasaPacketTypes) else "unknown"
+        payloadTypeStr = NasaPayloadTypes[payloadType] if payloadType < len(NasaPayloadTypes) else "unknown"
+
+        output = []
+        output.append(f"Source: {self.bin2hex(src).upper()}")
+        output.append(f"Destination: {self.bin2hex(dst).upper()}")
+        output.append(f"Packet Type: {packetTypStr}")
+        output.append(f"Payload Type: {payloadTypeStr}")
+        output.append(f"Packet Number: {hex(packetNumber)}")
+
+        ds = []
+        off = 10
+        seenMsgCnt = 0
+
+        for i in range(dsCnt):
+            seenMsgCnt += 1
+            kind = (data[off] & 0x6) >> 1
+            size_map = {0: 1, 1: 2, 2: 4}
+            s = size_map.get(kind, None)
+
+            if s is None:
+                return f"Error: Invalid data size at offset {off}"
+
+            messageNumber = struct.unpack(">H", data[off: off + 2])[0]
+            value = data[off + 2:off + 2 + s]
+            valuehex = self.bin2hex(value)
+
+            valuedec = []
+            if s == 1:
+                intval = struct.unpack(">b", value)[0]
+                valuedec.append(intval)
+                valuedec.append("ON" if value[0] != 0 else "OFF")
+            elif s == 2:
+                intval = struct.unpack(">h", value)[0]
+                valuedec.append(intval)
+                valuedec.append(intval / 10.0)
+            elif s == 4:
+                intval = struct.unpack(">i", value)[0]
+                valuedec.append(intval)
+                valuedec.append(intval / 10.0)
+
+            desc = nasa_message_name(messageNumber) if "nasa_message_name" in globals() else "UNSPECIFIED"
+
+            output.append(f"  {hex(messageNumber)} ({desc}): {valuehex} | {valuedec}")
+            ds.append([messageNumber, desc, valuehex, value, valuedec])
+            off += 2 + s
+
+        if seenMsgCnt != dsCnt:
+            print("Error: Not every message processed")
+            return DecodeResult.Failure
+
+        print("\n".join(output))
+
 
         return DecodeResult.Success  # Assuming a success case exists
 
