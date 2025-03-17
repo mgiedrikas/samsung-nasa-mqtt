@@ -1,6 +1,7 @@
 import queue
 import threading
 import time
+from datetime import datetime
 
 import serial
 
@@ -114,6 +115,8 @@ class SerialHandler:
                     if len(payload) > 0:
                         payload.extend(b)
                         print('-'*100)
+                        print(datetime.now())
+                        print(payload.hex())
                         print(f'{len(payload)}:', payload.hex(' '))
                         parser.parse_nasa(payload)
                         print('\ndiscarded')
