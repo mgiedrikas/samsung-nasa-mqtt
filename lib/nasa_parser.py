@@ -77,7 +77,7 @@ class NasaPacketParser:
             data = data[:-4]
             for _ in range(1, capacity + 1):
                 try:
-                    message_set, ex, size = MessageSet.decode(data, cursor, capacity)
+                    message_set, ex = MessageSet.decode(data, cursor, capacity)
                     if ex is None:
                         messages.append(message_set)
                     cursor += message_set.size
