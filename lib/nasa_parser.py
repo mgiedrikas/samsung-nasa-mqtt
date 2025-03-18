@@ -44,18 +44,17 @@ class NasaPacketParser:
             size = (data[1] << 8) | data[2]
             if size + 2 != len(data):
                 print(f' - size expected {size + 2} != paylod {len(data)}')
-                return DecodeResult.SizeDidNotMatch
+                # return DecodeResult.SizeDidNotMatch
+            else:
+                print(f' - sizeok: {size + 2 == len(data)}')
 
             crc_actual = crc16(data, 3, size - 4)
             crc_expected = (data[-3] << 8) | data[-2]
 
-            print(f' - sizeok: {size + 2 == len(data)}')
-            print(f' - crc ok: {crc_actual == crc_expected}')
-
             if crc_expected != crc_actual:
-                print(f"NASA: invalid crc - got {crc_actual} but should be {crc_expected}")
-                print(data.hex(' '))
-                return DecodeResult.CrcError
+                print(f"NASA: invalid crc - got:{crc_actual} expected: {crc_expected}")
+                # print(data.hex(' '))
+                # return DecodeResult.CrcError
 
             cursor = 3
             sa = Address()
@@ -72,18 +71,18 @@ class NasaPacketParser:
 
             capacity = data[cursor]
             cursor += 1
-            print(f' - Src.{sa}')
-            print(f' - Dst.{da}')
-            print(command)
-            print(f'capacity {capacity} bytes, cursor: {cursor}')
-            print()
+            print(f'Src.{sa}  Dst.{da} Cmd.{command}')
 
             messages = []
+            data = data[:-4]
             for _ in range(1, capacity + 1):
-                message_set = MessageSet.decode(data, cursor, capacity)
-                messages.append(message_set)
-                cursor += message_set.size
-                print(message_set)
+                try:
+                    message_set = MessageSet.decode(data, cursor, capacity)
+                    messages.append(message_set)
+                    cursor += message_set.size
+                    print(message_set)
+                except Exception as e:
+                    print(f'failed to decode message: {e}')
 
         # dsCnt = data[9]
         # print(f'dsCnt {dsCnt} bytes')

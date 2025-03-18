@@ -801,16 +801,16 @@ class MessageSet:
         set_instance = MessageSet(message_number)
 
         if set_instance.type == MessageSetType.ENUM:
-            set_instance.value = data[index + 2]
             set_instance.size = 3
+            set_instance.value = data[index + 2]
 
         elif set_instance.type == MessageSetType.VARIABLE:
-            set_instance.value = int.from_bytes(data[index + 2:index + 4], "big")
             set_instance.size = 4
+            set_instance.value = int.from_bytes(data[index + 2:index + 4], "big")
 
         elif set_instance.type == MessageSetType.LONG_VARIABLE:
-            set_instance.value = int.from_bytes(data[index + 2:index + 6], "big")
             set_instance.size = 6
+            set_instance.value = int.from_bytes(data[index + 2:index + 6], "big")
 
         elif set_instance.type == MessageSetType.STRUCTURE:
             if capacity != 1:
@@ -900,12 +900,13 @@ class Command:
         data.extend([byte1, byte2, self.packet_number])
 
     def __str__(self):
-        return (f"PacketInformation: {self.packet_information}\n"
-                f"ProtocolVersion: {self.protocol_version}\n"
-                f"RetryCount: {self.retry_count}\n"
-                f"PacketType: {self.packet_type}\n"
-                f"DataType: {self.data_type}\n"
-                f"PacketNumber: {self.packet_number}")
+        # return (f"PacketInformation: {self.packet_information}\n"
+        #         f"ProtocolVersion: {self.protocol_version}\n"
+        #         f"RetryCount: {self.retry_count}\n"
+        #         f"PacketType: {self.packet_type}\n"
+        #         f"DataType: {self.data_type}\n"
+        #         f"PacketNumber: {self.packet_number}")
+        return f"DataType: {self.data_type:<10} PacketNumber: {self.packet_number:03d}"
 
 
 class DecodeResult(Enum):
