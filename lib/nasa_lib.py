@@ -796,34 +796,38 @@ class MessageSet:
         self.size = 2
 
     @staticmethod
-    def decode(data: bytes, index: int, capacity: int) -> "MessageSet":
+    def decode(data: bytes, index: int, capacity: int) -> ("MessageSet", Exception, int):
         message_number = MessageNumber(int.from_bytes(data[index:index + 2], "big"))
         set_instance = MessageSet(message_number)
 
-        if set_instance.type == MessageSetType.ENUM:
-            set_instance.size = 3
-            set_instance.value = data[index + 2]
+        try:
+            if set_instance.type == MessageSetType.ENUM:
+                set_instance.size = 3
+                set_instance.value = data[index + 2]
 
-        elif set_instance.type == MessageSetType.VARIABLE:
-            set_instance.size = 4
-            set_instance.value = int.from_bytes(data[index + 2:index + 4], "big")
+            elif set_instance.type == MessageSetType.VARIABLE:
+                set_instance.size = 4
+                set_instance.value = int.from_bytes(data[index + 2:index + 4], "big")
 
-        elif set_instance.type == MessageSetType.LONG_VARIABLE:
-            set_instance.size = 6
-            set_instance.value = int.from_bytes(data[index + 2:index + 6], "big")
+            elif set_instance.type == MessageSetType.LONG_VARIABLE:
+                set_instance.size = 6
+                set_instance.value = int.from_bytes(data[index + 2:index + 6], "big")
 
-        elif set_instance.type == MessageSetType.STRUCTURE:
-            if capacity != 1:
-                print(f"Error: structure messages can only have one message but is {capacity}")
-                return set_instance
+            elif set_instance.type == MessageSetType.STRUCTURE:
+                if capacity != 1:
+                    print(f"Error: structure messages can only have one message but is {capacity}")
+                    return set_instance
 
-            set_instance.size = len(data) - index - 3  # 3=end bytes
-            buffer = Buffer(set_instance.size - 2)
-            buffer.data[:] = data[index + 2:index + set_instance.size]
-            set_instance.value = buffer
+                set_instance.size = len(data) - index - 3  # 3=end bytes
+                buffer = Buffer(set_instance.size - 2)
+                buffer.data[:] = data[index + 2:index + set_instance.size]
+                set_instance.value = buffer
 
-        else:
-            print("Error: Unknown type")
+            else:
+                print("Error: Unknown type")
+        except Exception as e:
+            print(f'failed to decode message: {e}')
+            return set_instance, e, set_instance.size
 
         return set_instance
 
