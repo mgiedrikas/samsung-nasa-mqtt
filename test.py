@@ -9,7 +9,7 @@ logger = get_logger(__name__)
 
 
 def main_serial():
-    s = SerialHandler("/dev/ttyUSB0", 115200)
+    s = SerialHandler("/dev/ttyACM0", 9600)
     s.start()
 
     while True:

@@ -7,7 +7,11 @@ from lib.nasa_lib import DecodeResult, Address, Command, MessageSet
 from nasa_messages import nasa_message_name
 from packetgateway import NasaPacketTypes, NasaPayloadTypes
 
+"""
+for my heatpump variable 8414 indicates the total consumed power since installation. 8413 shows total actual consumption. 4427 is total produced energy, 4426 is actual produced energy
 
+8413 and 8414 are in W. I also see value for 8411 which is always bit less than 8413. Seems to be the net power consumption of the outdoor unit. 8413 looks like total power consumption of outdoor and indoor unit (so including water pump, electronics, etc).
+"""
 def crc16(data: bytes, start_index: int, length: int) -> int:
     crc = 0
     for index in range(start_index, start_index + length):
