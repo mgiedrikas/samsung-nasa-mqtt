@@ -796,7 +796,7 @@ class MessageSet:
         self.size = 2
 
     @staticmethod
-    def decode(data: bytes, index: int, capacity: int) -> ("MessageSet", Exception, int):
+    def decode(data: bytes, index: int, capacity: int) -> ("MessageSet", Exception):
         message_number = MessageNumber(int.from_bytes(data[index:index + 2], "big"))
         set_instance = MessageSet(message_number)
 
@@ -827,9 +827,9 @@ class MessageSet:
                 print("Error: Unknown type")
         except Exception as e:
             print(f'failed to decode message: {e}')
-            return set_instance, e, set_instance.size
+            return set_instance, e
 
-        return set_instance
+        return set_instance, None
 
     def __repr__(self):
         value_repr = self.value
