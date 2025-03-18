@@ -85,8 +85,7 @@ class NasaPacketParser:
                     cursor += message_set.size
                     print(message_set)
                 except Exception as e:
-                    print("failed to decode message, breaking loop - ", e)
-                    break
+                    print("failed to decode message - ", e)
 
         # dsCnt = data[9]
         # print(f'dsCnt {dsCnt} bytes')
