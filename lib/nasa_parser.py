@@ -80,10 +80,13 @@ class NasaPacketParser:
                     message_set, ex = MessageSet.decode(data, cursor, capacity)
                     if ex is None:
                         messages.append(message_set)
+                    else:
+                        break
                     cursor += message_set.size
                     print(message_set)
                 except Exception as e:
-                    print(f'failed to decode message: {e}')
+                    print("failed to decode message, breaking loop - ", e)
+                    break
 
         # dsCnt = data[9]
         # print(f'dsCnt {dsCnt} bytes')
