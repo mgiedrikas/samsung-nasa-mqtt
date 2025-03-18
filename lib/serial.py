@@ -121,6 +121,7 @@ class SerialHandler:
                         parser.parse_nasa(payload)
                         print('\ndiscarded')
                         print(f'{len(discarded)}:', discarded.hex(' '))
+                        print(discarded.hex())
                         print('-'*100)
                         print()
                         payload = bytearray()
